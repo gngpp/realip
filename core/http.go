@@ -7,6 +7,9 @@ import (
 )
 
 func ExtractRealIp(request *http.Request) string {
+	if strings.Contains(request.RemoteAddr, "::1") || strings.Contains(request.RemoteAddr, "localhost") {
+		return "127.0.0.1"
+	}
 	// Obtain through firewall
 	ip := strings.TrimSpace(request.Header.Get("X-Forwarded-For"))
 	if ip != "" {
