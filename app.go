@@ -21,7 +21,7 @@ func main() {
 
 //goland:noinspection SpellCheckingInspection
 func port() string {
-	port := flag.String("p", "8080", "realip Server port")
+	port := flag.String("p", "8080", "realip server port")
 	// parse variable
 	flag.Parse()
 	log.Println("realip server port:" + *port)
