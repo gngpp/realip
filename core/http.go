@@ -4,6 +4,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func ExtractRealIp(request *http.Request) string {
@@ -36,4 +37,11 @@ func GetRequestURL(request *http.Request) (url string) {
 		url = "https://" + request.Host + request.RequestURI
 	}
 	return
+}
+
+func GetHandlerTime() func() string {
+	start := time.Now()
+	return func() string {
+		return time.Now().Sub(start).String()
+	}
 }

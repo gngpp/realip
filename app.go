@@ -2,27 +2,53 @@ package main
 
 import (
 	"Realip/core"
-	"github.com/gin-gonic/gin"
+	"encoding/json"
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
 )
 
+//goland:noinspection SpellCheckingInspection
 func main() {
-	engine := gin.Default()
-	engine.GET("/ip", requestHandler)
-	err := engine.Run(":8081")
+	port := port()
+	http.HandleFunc("/ip", requestHandler)
+	err := http.ListenAndServe(port, http.DefaultServeMux)
 	if err != nil {
-		panic(err)
+		log.Fatalf("abnormal listening address, %s", err)
 	}
 }
 
-func requestHandler(ctx *gin.Context) {
-	request := ctx.Request
+//goland:noinspection SpellCheckingInspection
+func port() string {
+	port := flag.String("p", "8080", "Realip Server port")
+	// parse variable
+	flag.Parse()
+	log.Println("Realip server port:" + *port)
+	return ":" + *port
+}
+
+func requestHandler(writer http.ResponseWriter, request *http.Request) {
+	handlerTimeFunc := core.GetHandlerTime()
 	url := core.GetRequestURL(request)
+	ip := core.ExtractRealIp(request)
 	data := &core.ResponseData{
 		Proto:      request.Proto,
+		RealIp:     ip,
 		Uri:        request.RequestURI,
-		RealIp:     core.ExtractRealIp(request),
 		RequestURL: url,
 		Method:     request.Method,
 	}
-	ctx.JSON(200, data)
+	defer func() {
+		data.Time = handlerTimeFunc()
+		marshal, err := json.Marshal(data)
+		writer.Header().Add("Content-type", "application/json")
+		if err != nil {
+			writer.WriteHeader(500)
+		}
+		_, err = fmt.Fprint(writer, string(marshal))
+		if err != nil {
+			log.Println(err)
+		}
+	}()
 }
