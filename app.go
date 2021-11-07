@@ -1,12 +1,12 @@
 package main
 
 import (
-	"Realip/core"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"realip/core"
 )
 
 //goland:noinspection SpellCheckingInspection
@@ -21,10 +21,10 @@ func main() {
 
 //goland:noinspection SpellCheckingInspection
 func port() string {
-	port := flag.String("p", "8080", "Realip Server port")
+	port := flag.String("p", "8080", "realip Server port")
 	// parse variable
 	flag.Parse()
-	log.Println("Realip server port:" + *port)
+	log.Println("realip server port:" + *port)
 	return ":" + *port
 }
 
